@@ -1,19 +1,41 @@
 import React from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
+import * as yup from "yup";
 
 const InitialOnboardingForm = {
   name: "",
   email: "",
-  password: ""
+  password: "",
+  terms: false
 };
 
-function UserForm({ onSubmit }) {
+const validationSchema = yup.object().shape({
+  name: yup.string().required(),
+  email: yup
+    .string()
+    .email("E-mail is not valid!")
+    .required("E-mail is required!"),
+  password: yup
+    .string()
+    .min(6, "Password has to be longer than 6 characters!")
+    .required("Password is required!"),
+  terms: yup
+    .bool()
+    .test(
+      "terms",
+      "You have to agree with our Terms and Conditions!",
+      value => value === true
+    )
+    .required("You have to agree with our Terms and Conditions!")
+});
+
+function UserForm(props) {
   return (
     <Formik
-      // validationSchema={validationSchema}
+      validationSchema={validationSchema}
       // validate={validate}
       initialValues={InitialOnboardingForm}
-      onSubmit={onSubmit}
+      onSubmit={props.onSubmit}
       render={props => {
         return (
           // we will use pre-baked components
@@ -43,7 +65,12 @@ function UserForm({ onSubmit }) {
             <div>
               <label>
                 Terms of Service
-                <Field name="terms" type="checkbox" placeholder="Age" />
+                <Field
+                  name="terms"
+                  type="checkbox"
+                  checked={props.values.terms}
+                  placeholder="Age"
+                />
                 <ErrorMessage name="terms" component="div" />
               </label>
             </div>

@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import axios from "axios";
-import * as yup from "yup";
 import UserForm from "./Form";
+import Users from "./Users";
 import "./App.css";
 
 const formApi = "https://reqres.in/api/users";
@@ -9,20 +9,6 @@ const formApi = "https://reqres.in/api/users";
 function App() {
   const [usersList, setUsersList] = useState([]);
   const [serverError, setServerError] = useState("");
-
-  const fetchUsers = () => {
-    // get those friends from the api
-    // and set them into the right slice of state!
-    // don't forget about the sad path: put something in `serverError`
-    axios
-      .get(formApi)
-      .then(res => {
-        setUsersList(res.data);
-      })
-      .catch(err => {
-        setServerError(err.message);
-      });
-  };
 
   const addUser = (formValues, actions) => {
     // THIS FUNCTION NEEDS TO COMPLY WITH FORMIK
@@ -34,8 +20,10 @@ function App() {
     const UserToPost = {
       name: formValues.name,
       email: formValues.email,
-      password: formValues.password
+      password: formValues.password,
+      terms: formValues.terms
     };
+
     axios
       .post(formApi, UserToPost)
       .then(res => {
@@ -45,30 +33,18 @@ function App() {
         actions.resetForm();
       })
       .catch(err => {
-        debugger;
+        setServerError(err.message);
       });
   };
 
-  useEffect(() => {
-    fetchUsers();
-  }, []);
-
   return (
     <div className="App">
+      {serverError}
       <h1>User Onboarding</h1>
       <UserForm onSubmit={addUser} />
-
-      {usersList.length
-        ? usersList.map(fr => <div key={fr}>{fr.name} is Saved.</div>)
-        : "No Users. Sad!"}
+      <Users usersList={usersList} />
     </div>
   );
 }
-
-const validationSchema = yup.object().shape({
-  name: yup.string().required("GAGAHHH WE NEED NAME"),
-  email: yup.email().required(),
-  password: yup.password().required()
-});
 
 export default App;
