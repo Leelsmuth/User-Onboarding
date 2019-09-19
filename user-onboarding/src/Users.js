@@ -7,12 +7,12 @@ export default function Users(props) {
       <h4>List of Onboarded Users</h4>
       {usersList.length
         ? usersList.map(user => (
-            <ul key={user.id}>
+            <div key={user.id}>
               <p>
                 Congrats {user.name}, you have successfully registered. Your
                 email:({user.email}), will serve as your username...
               </p>
-            </ul>
+            </div>
           ))
         : "No Users. Sad!"}
     </div>
